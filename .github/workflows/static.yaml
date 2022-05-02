@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: 2022 Andrea Pappacoda <andrea@pappacoda.it>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: static
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: sh
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:bullseye
+
+  steps:
+  - name: Install dependencies
+    run: |
+      apt -y update
+      apt -y install --no-install-recommends gcc g++ libc-dev meson pkg-config cmake libcurl4-openssl-dev git ca-certificates curl
+
+  # Quel sed non va bene perché modifica anche i cmake.dependency, e perché
+  # fa cose del tipo:
+  #
+  #     dependency('boost.ut', fallback: ['ut', 'boostut_dep', static: true])
+  #
+  # ovvero static: in fallback (risolvibile con .*?); oppure anche
+  #
+  #     INIReader_dep = dependency(
+  #         'INIReader',
+  #         default_options: ['default_library=static', 'distro_install=false']
+  #     )
+  #
+  # ovvero nessuno static: proprio.
+  #
+  # sed non supporta .*?, ma è possibile ricorrere ad un workaround: posso
+  # dirgli di non matchare tutto tranne il carattere che voglio che venga
+  # considerato come la fine del match. Da:
+  # https://0x2a.at/blog/2008/07/sed--non-greedy-matching/
+  #
+  #     sed -i -E -e "s/(dependency\('[^']*')/\1, static: true/g"
+  #
+  # Ma questo ancora non risolve il mio problema con dependency(\n'nome').
+  # Purtroppo sed opera riga per riga, quindi non c'è nulla che possa
+  # fargli matchare una newline. Per fortuna (o purtroppo), c'è perl.
+  # Qui la chiave è l'opzione -0, che gli dice di lavorare sull'intero file
+  # invece che riga per riga, e /s, che fa valere il . anche come \n.
+  #
+  #     perl -0pi -e "s/(dependency\(.*?'.*?')/\1, static: true/gs"
+  #
+  # Ora rimane soltanto sistemare il cmake.dependency(). Sembra che
+  # richiedendo che dependency sia preceduto da dello spazio, \s, risolva
+  # il problema. È probabile che però questo non matchi delle situazioni
+  # del tipo
+  #
+  #     name_dep =
+  #     dependency('name')
+  #
+  # Strano, brutto, ma valido.
+  # E INVECE SEMBRA DI SÌ, YEY.
+
+  - name: Build cloudflare-ddns
+    run: |
+      curl --location --remote-name --remote-header-name https://github.com/Tachi107/cloudflare-ddns/archive/refs/heads/main.tar.gz
+      tar xf cloudflare-ddns-*.tar.gz
+      cd cloudflare-ddns-*/
+      find . -type f -name meson.build -exec perl -0pi -e "s/(dependency\(.*?'.*?')/\1, static: true/gs" {} \;
