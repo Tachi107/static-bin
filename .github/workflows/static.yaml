@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt -y update
-        apt -y install --no-install-recommends gcc g++ libc-dev meson pkg-config cmake libcurl4-openssl-dev git ca-certificates curl
+        apt -y install --no-install-recommends gcc g++ libc-dev meson pkg-config cmake libcurl4-openssl-dev git ca-certificates curl libinih-dev
 
   # Quel sed non va bene perché modifica anche i cmake.dependency, e perché
   # fa cose del tipo:
