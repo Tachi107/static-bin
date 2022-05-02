@@ -71,3 +71,5 @@ jobs:
         tar xf cloudflare-ddns-*.tar.gz
         cd cloudflare-ddns-*/
         find . -type f -name meson.build -exec perl -0pi -e "s/(\s+dependency\(.*?'.*?')/\1, static: true/gs" {} \;
+        LDFLAGS=-static meson setup build
+        meson compile -C build
