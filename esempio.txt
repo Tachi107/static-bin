@@ -1,0 +1,7 @@
+int main() {
+	int ciao = 0;
+	char carattere = 'a';
+	const char* frase = "ho ridefinito contains";
+
+	printf("variabili: %d, %c, %s", ciao, carattere, frase);
+}
