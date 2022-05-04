@@ -3,5 +3,5 @@ int main() {
 	char carattere = 'a';
 	const char* frase = "ho ridefinito contains";
 
-	printf("variabili: %d, %c, %s", ciao, carattere, frase);
+	printf("vari: %d, %c, %s", ciao, carattere, frase);
 }
