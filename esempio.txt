@@ -4,4 +4,5 @@ int main() {
 	const char* frase = "ho ridefinito contains";
 
 	printf("vari che ho creato perché sono tre: %d, %c, %s", ciao, carattere, frase);
+
 }
