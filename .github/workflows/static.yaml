@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt -y update
-        apt -y install --no-install-recommends gcc g++ libc-dev meson pkg-config cmake libcurl4-openssl-dev git ca-certificates curl libinih-dev zlib1g-dev libnghttp2-dev libidn2-dev librtmp-dev libssh2-dev libpsl-dev libssl-dev libgssapi_krb5-dev libkrb5-dev libk5crypto-dev libcom_err-dev liblber-dev libldap-dev libbrotli-dev
+        apt -y install --no-install-recommends gcc g++ libc-dev meson pkg-config cmake libcurl4-openssl-dev git ca-certificates curl libinih-dev zlib1g-dev libnghttp2-dev libidn2-dev librtmp-dev libssh2-1-dev libpsl-dev libssl-dev libkrb5-dev comerr-dev liblber-dev libldap-dev libbrotli-dev
 
   # Quel sed non va bene perché modifica anche i cmake.dependency, e perché
   # fa cose del tipo:
